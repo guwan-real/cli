@@ -14,7 +14,7 @@ var BaseTableCreate = common.Shortcut{
 	Command:     "+table-create",
 	Description: "Create a table and optional fields/views",
 	Risk:        "write",
-	Scopes:      []string{"base:table:create", "base:field:read", "base:field:create", "base:field:update", "base:view:write_only"},
+	Scopes:      []string{"base:table:create"},
 	AuthTypes:   authTypes(),
 	Flags: []common.Flag{
 		baseTokenFlag(true),

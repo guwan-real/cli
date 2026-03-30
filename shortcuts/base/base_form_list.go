@@ -27,42 +27,25 @@ var BaseFormsList = common.Shortcut{
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			GET("/open-apis/base/v3/bases/:base_token/tables/:table_id/forms").
+			GET("/open-apis/bitable/v1/apps/:base_token/tables/:table_id/views").
 			Set("base_token", runtime.Str("base-token")).
 			Set("table_id", runtime.Str("table-id"))
 	},
 	Execute: func(ctx context.Context, runtime *common.RuntimeContext) error {
-		baseToken := runtime.Str("base-token")
-		tableId := runtime.Str("table-id")
-
-		var allForms []interface{}
-		pageToken := ""
-		for {
-			params := map[string]interface{}{
-				"page_size": runtime.Int("page-size"),
+		views, _, err := listAllViews(runtime, runtime.Str("base-token"), runtime.Str("table-id"), 0, runtime.Int("page-size"))
+		if err != nil {
+			return err
+		}
+		allForms := make([]interface{}, 0)
+		for _, view := range views {
+			if viewType(view) == "form" {
+				allForms = append(allForms, map[string]interface{}{
+					"id":          viewID(view),
+					"name":        viewName(view),
+					"description": view["description"],
+					"type":        viewType(view),
+				})
 			}
-			if pageToken != "" {
-				params["page_token"] = pageToken
-			}
-
-			data, err := baseV3Call(runtime, "GET",
-				baseV3Path("bases", baseToken, "tables", tableId, "forms"), params, nil)
-			if err != nil {
-				return err
-			}
-
-			forms, _ := data["forms"].([]interface{})
-			allForms = append(allForms, forms...)
-
-			hasMore, _ := data["has_more"].(bool)
-			if !hasMore {
-				break
-			}
-			nextToken, _ := data["page_token"].(string)
-			if nextToken == "" {
-				break
-			}
-			pageToken = nextToken
 		}
 
 		outData := map[string]interface{}{
@@ -81,6 +64,7 @@ var BaseFormsList = common.Shortcut{
 					"id":          m["id"],
 					"name":        m["name"],
 					"description": m["description"],
+					"type":        m["type"],
 				})
 			}
 			output.PrintTable(w, rows)

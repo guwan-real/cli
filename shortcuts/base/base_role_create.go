@@ -6,14 +6,8 @@ package base
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"net/http"
-	"strings"
-
-	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
-
-	"github.com/larksuite/cli/internal/validate"
 	"github.com/larksuite/cli/shortcuts/common"
+	"strings"
 )
 
 var BaseRoleCreate = common.Shortcut{
@@ -41,24 +35,19 @@ var BaseRoleCreate = common.Shortcut{
 		var body map[string]any
 		json.Unmarshal([]byte(runtime.Str("json")), &body)
 		return common.NewDryRunAPI().
-			POST("/open-apis/base/v3/bases/:base_token/roles").
+			POST("/open-apis/bitable/v1/apps/:base_token/roles").
 			Body(body).
 			Set("base_token", runtime.Str("base-token"))
 	},
 	Execute: func(ctx context.Context, runtime *common.RuntimeContext) error {
-		baseToken := runtime.Str("base-token")
 		var body map[string]any
 		json.Unmarshal([]byte(runtime.Str("json")), &body)
 
-		apiResp, err := runtime.DoAPI(&larkcore.ApiReq{
-			HttpMethod: http.MethodPost,
-			ApiPath:    fmt.Sprintf("/open-apis/base/v3/bases/%s/roles", validate.EncodePathSegment(baseToken)),
-			Body:       body,
-		})
+		data, err := baseV3Call(runtime, "POST", baseRolePath(runtime.Str("base-token")), nil, body)
 		if err != nil {
 			return err
 		}
-
-		return handleRoleResponse(runtime, apiResp.RawBody, "create role failed")
+		runtime.Out(data, nil)
+		return nil
 	},
 }

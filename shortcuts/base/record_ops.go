@@ -36,9 +36,10 @@ func dryRunRecordGet(_ context.Context, runtime *common.RuntimeContext) *common.
 
 func dryRunRecordUpsert(_ context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 	body, _ := parseJSONObject(runtime.Str("json"), "json")
+	body = normalizeRecordBody(body)
 	if recordID := runtime.Str("record-id"); recordID != "" {
 		return common.NewDryRunAPI().
-			PATCH("/open-apis/base/v3/bases/:base_token/tables/:table_id/records/:record_id").
+			PUT("/open-apis/base/v3/bases/:base_token/tables/:table_id/records/:record_id").
 			Body(body).
 			Set("base_token", runtime.Str("base-token")).
 			Set("table_id", baseTableID(runtime)).
@@ -78,6 +79,16 @@ func validateRecordJSON(runtime *common.RuntimeContext) error {
 	return nil
 }
 
+func normalizeRecordBody(body map[string]interface{}) map[string]interface{} {
+	if body == nil {
+		return nil
+	}
+	if _, ok := body["fields"]; ok {
+		return body
+	}
+	return map[string]interface{}{"fields": body}
+}
+
 func executeRecordList(runtime *common.RuntimeContext) error {
 	offset := runtime.Int("offset")
 	if offset < 0 {
@@ -110,10 +121,11 @@ func executeRecordUpsert(runtime *common.RuntimeContext) error {
 	if err != nil {
 		return err
 	}
+	body = normalizeRecordBody(body)
 	baseToken := runtime.Str("base-token")
 	tableIDValue := baseTableID(runtime)
 	if recordID := runtime.Str("record-id"); recordID != "" {
-		data, err := baseV3Call(runtime, "PATCH", baseV3Path("bases", baseToken, "tables", tableIDValue, "records", recordID), nil, body)
+		data, err := baseV3Call(runtime, "PUT", baseV3Path("bases", baseToken, "tables", tableIDValue, "records", recordID), nil, body)
 		if err != nil {
 			return err
 		}

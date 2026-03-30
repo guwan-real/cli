@@ -5,14 +5,8 @@ package base
 
 import (
 	"context"
-	"fmt"
-	"net/http"
-	"strings"
-
-	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
-
-	"github.com/larksuite/cli/internal/validate"
 	"github.com/larksuite/cli/shortcuts/common"
+	"strings"
 )
 
 var BaseRoleList = common.Shortcut{
@@ -34,20 +28,24 @@ var BaseRoleList = common.Shortcut{
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			GET("/open-apis/base/v3/bases/:base_token/roles").
+			GET("/open-apis/bitable/v1/apps/:base_token/roles").
 			Set("base_token", runtime.Str("base-token"))
 	},
 	Execute: func(ctx context.Context, runtime *common.RuntimeContext) error {
-		baseToken := runtime.Str("base-token")
-
-		apiResp, err := runtime.DoAPI(&larkcore.ApiReq{
-			HttpMethod: http.MethodGet,
-			ApiPath:    fmt.Sprintf("/open-apis/base/v3/bases/%s/roles", validate.EncodePathSegment(baseToken)),
-		})
+		data, err := baseV3Call(runtime, "GET", baseRolePath(runtime.Str("base-token")), nil, nil)
 		if err != nil {
 			return err
 		}
-
-		return handleRoleResponse(runtime, apiResp.RawBody, "list roles failed")
+		items, _ := data["items"].([]interface{})
+		if len(items) == 0 {
+			items, _ = data["roles"].([]interface{})
+		}
+		if len(items) == 0 {
+			if _, ok := data["role_id"]; ok {
+				items = []interface{}{data}
+			}
+		}
+		runtime.Out(map[string]interface{}{"items": items, "total": len(items)}, nil)
+		return nil
 	},
 }

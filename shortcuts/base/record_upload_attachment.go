@@ -71,7 +71,7 @@ func dryRunRecordUploadAttachment(_ context.Context, runtime *common.RuntimeCont
 			"parent_node": runtime.Str("base-token"),
 			"file":        "@" + filePath,
 		}).
-		PATCH("/open-apis/base/v3/bases/:base_token/tables/:table_id/records/:record_id").
+		PUT("/open-apis/base/v3/bases/:base_token/tables/:table_id/records/:record_id").
 		Desc("[4] Update the target attachment cell with existing attachments plus the uploaded file token").
 		Body(map[string]interface{}{
 			"<attachment_field_name>": []interface{}{
@@ -138,7 +138,7 @@ func executeRecordUploadAttachment(runtime *common.RuntimeContext) error {
 	body := map[string]interface{}{
 		fieldName(field): attachments,
 	}
-	data, err := baseV3Call(runtime, "PATCH", baseV3Path("bases", runtime.Str("base-token"), "tables", baseTableID(runtime), "records", runtime.Str("record-id")), nil, body)
+	data, err := baseV3Call(runtime, "PUT", baseV3Path("bases", runtime.Str("base-token"), "tables", baseTableID(runtime), "records", runtime.Str("record-id")), nil, body)
 	if err != nil {
 		return err
 	}

@@ -21,7 +21,7 @@ import (
 
 const (
 	batchSize         = 500
-	baseV3ServicePath = "/open-apis/base/v3"
+	baseV3ServicePath = "/open-apis/bitable/v1"
 )
 
 type fieldTypeSpec struct {
@@ -356,9 +356,12 @@ func buildTableFieldBodies(rawFields string, rawFieldSpecs string) ([]interface{
 
 func baseV3Path(parts ...string) string {
 	clean := make([]string, 0, len(parts))
-	for _, part := range parts {
+	for idx, part := range parts {
 		part = strings.Trim(part, "/")
 		if part != "" {
+			if idx == 0 && part == "bases" {
+				part = "apps"
+			}
 			clean = append(clean, url.PathEscape(part))
 		}
 	}
@@ -406,6 +409,97 @@ func baseV3Call(runtime *common.RuntimeContext, method, path string, params map[
 func baseV3CallAny(runtime *common.RuntimeContext, method, path string, params map[string]interface{}, data interface{}) (interface{}, error) {
 	result, err := baseV3Raw(runtime, method, path, params, data)
 	return handleBaseAPIResultAny(result, err, "API call failed")
+}
+
+func baseRolePath(baseToken string, parts ...string) string {
+	pathParts := []string{"bases", baseToken, "roles"}
+	pathParts = append(pathParts, parts...)
+	return baseV3Path(pathParts...)
+}
+
+func baseFormPath(baseToken, tableID, formID string, extra ...string) string {
+	pathParts := []string{"bases", baseToken, "tables", tableID, "forms"}
+	if formID != "" {
+		pathParts = append(pathParts, formID)
+	}
+	pathParts = append(pathParts, extra...)
+	return baseV3Path(pathParts...)
+}
+
+func listAllRoleMembers(runtime *common.RuntimeContext, baseToken, roleID string, pageSize int) ([]map[string]interface{}, int, error) {
+	if pageSize <= 0 || pageSize > 100 {
+		pageSize = 100
+	}
+	var (
+		items     []map[string]interface{}
+		pageToken string
+		total     int
+	)
+	for {
+		params := map[string]interface{}{"page_size": pageSize}
+		if pageToken != "" {
+			params["page_token"] = pageToken
+		}
+		data, err := baseV3Call(runtime, http.MethodGet, baseRolePath(baseToken, roleID, "members"), params, nil)
+		if err != nil {
+			return nil, 0, err
+		}
+		rawItems, _ := data["items"].([]interface{})
+		if len(rawItems) == 0 {
+			rawItems, _ = data["members"].([]interface{})
+		}
+		for _, item := range rawItems {
+			if m, ok := item.(map[string]interface{}); ok {
+				items = append(items, m)
+			}
+		}
+		if total == 0 {
+			total = toInt(data["total"])
+		}
+		hasMore, _ := data["has_more"].(bool)
+		if !hasMore {
+			break
+		}
+		nextToken, _ := data["page_token"].(string)
+		if nextToken == "" {
+			break
+		}
+		pageToken = nextToken
+	}
+	if total == 0 {
+		total = len(items)
+	}
+	return items, total, nil
+}
+
+func simplifyRoleMembers(items []map[string]interface{}) []interface{} {
+	out := make([]interface{}, 0, len(items))
+	for _, item := range items {
+		entry := map[string]interface{}{
+			"member_type": item["member_type"],
+			"member_name": item["member_name"],
+		}
+		if memberEnName, _ := item["member_en_name"].(string); memberEnName != "" {
+			entry["member_en_name"] = memberEnName
+		}
+		if openID, _ := item["open_id"].(string); openID != "" {
+			entry["open_id"] = openID
+		}
+		if userID, _ := item["user_id"].(string); userID != "" {
+			entry["user_id"] = userID
+		}
+		if unionID, _ := item["union_id"].(string); unionID != "" {
+			entry["union_id"] = unionID
+		}
+		if email, _ := item["email"].(string); email != "" {
+			entry["email"] = email
+		}
+		if mobile, _ := item["mobile"].(string); mobile != "" {
+			entry["mobile"] = mobile
+		}
+		out = append(out, entry)
+	}
+	return out
 }
 
 func toInt(v interface{}) int {
@@ -480,6 +574,14 @@ func listAllFields(runtime *common.RuntimeContext, baseToken, tableID string, of
 		return nil, 0, err
 	}
 	rawItems, _ := data["fields"].([]interface{})
+	if len(rawItems) == 0 {
+		rawItems, _ = data["items"].([]interface{})
+	}
+	if len(rawItems) == 0 {
+		if _, hasID := data["field_id"]; hasID {
+			rawItems = []interface{}{data}
+		}
+	}
 	items := make([]map[string]interface{}, 0, len(rawItems))
 	for _, item := range rawItems {
 		if m, ok := item.(map[string]interface{}); ok {
@@ -502,6 +604,14 @@ func listAllViews(runtime *common.RuntimeContext, baseToken, tableID string, off
 		return nil, 0, err
 	}
 	rawItems, _ := data["views"].([]interface{})
+	if len(rawItems) == 0 {
+		rawItems, _ = data["items"].([]interface{})
+	}
+	if len(rawItems) == 0 {
+		if _, hasID := data["view_id"]; hasID {
+			rawItems = []interface{}{data}
+		}
+	}
 	items := make([]map[string]interface{}, 0, len(rawItems))
 	for _, item := range rawItems {
 		if m, ok := item.(map[string]interface{}); ok {

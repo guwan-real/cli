@@ -5,21 +5,23 @@ package base
 
 import (
 	"context"
-	"github.com/larksuite/cli/shortcuts/common"
 	"strings"
+
+	"github.com/larksuite/cli/shortcuts/common"
 )
 
-var BaseRoleGet = common.Shortcut{
+var BaseMemberList = common.Shortcut{
 	Service:     "base",
-	Command:     "+role-get",
-	Description: "Get full config of a role",
+	Command:     "+member-list",
+	Description: "List collaborators in a custom role",
 	Risk:        "read",
 	Scopes:      []string{"base:role:read"},
 	AuthTypes:   []string{"user", "bot"},
 	HasFormat:   true,
 	Flags: []common.Flag{
 		{Name: "base-token", Desc: "base token", Required: true},
-		{Name: "role-id", Desc: "role ID (e.g. rolxxxxxx4)", Required: true},
+		{Name: "role-id", Desc: "role ID", Required: true},
+		{Name: "page-size", Type: "int", Default: "100", Desc: "page size per request (max 100)"},
 	},
 	Validate: func(ctx context.Context, runtime *common.RuntimeContext) error {
 		if strings.TrimSpace(runtime.Str("base-token")) == "" {
@@ -32,16 +34,20 @@ var BaseRoleGet = common.Shortcut{
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			GET("/open-apis/bitable/v1/apps/:base_token/roles/:role_id").
+			GET("/open-apis/bitable/v1/apps/:base_token/roles/:role_id/members").
+			Params(map[string]interface{}{"page_size": runtime.Int("page-size")}).
 			Set("base_token", runtime.Str("base-token")).
 			Set("role_id", runtime.Str("role-id"))
 	},
 	Execute: func(ctx context.Context, runtime *common.RuntimeContext) error {
-		data, err := baseV3Call(runtime, "GET", baseRolePath(runtime.Str("base-token"), runtime.Str("role-id")), nil, nil)
+		items, total, err := listAllRoleMembers(runtime, runtime.Str("base-token"), runtime.Str("role-id"), runtime.Int("page-size"))
 		if err != nil {
 			return err
 		}
-		runtime.Out(data, nil)
+		runtime.Out(map[string]interface{}{
+			"items": simplifyRoleMembers(items),
+			"total": total,
+		}, nil)
 		return nil
 	},
 }

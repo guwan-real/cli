@@ -32,7 +32,7 @@ func dryRunTableGet(_ context.Context, runtime *common.RuntimeContext) *common.D
 func dryRunTableCreate(_ context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 	return common.NewDryRunAPI().
 		POST("/open-apis/base/v3/bases/:base_token/tables").
-		Body(map[string]interface{}{"name": runtime.Str("name")}).
+		Body(map[string]interface{}{"table": map[string]interface{}{"name": runtime.Str("name")}}).
 		Set("base_token", runtime.Str("base-token"))
 }
 
@@ -79,15 +79,23 @@ func executeTableList(runtime *common.RuntimeContext) error {
 func executeTableGet(runtime *common.RuntimeContext) error {
 	baseToken := runtime.Str("base-token")
 	tableIDValue := runtime.Str("table-id")
-	table, err := baseV3Call(runtime, "GET", baseV3Path("bases", baseToken, "tables", tableIDValue), nil, nil)
+	tables, _, err := listAllTables(runtime, baseToken, 0, 100)
 	if err != nil {
 		return err
 	}
-	fields, err := listEveryField(runtime, baseToken, tableIDValue)
+	table, err := resolveTableRef(tables, tableIDValue)
 	if err != nil {
 		return err
 	}
-	views, err := listEveryView(runtime, baseToken, tableIDValue)
+	resolvedTableID := tableID(table)
+	if resolvedTableID == "" {
+		resolvedTableID = tableIDValue
+	}
+	fields, err := listEveryField(runtime, baseToken, resolvedTableID)
+	if err != nil {
+		return err
+	}
+	views, err := listEveryView(runtime, baseToken, resolvedTableID)
 	if err != nil {
 		return err
 	}
@@ -101,12 +109,22 @@ func executeTableGet(runtime *common.RuntimeContext) error {
 
 func executeTableCreate(runtime *common.RuntimeContext) error {
 	baseToken := runtime.Str("base-token")
-	created, err := baseV3Call(runtime, "POST", baseV3Path("bases", baseToken, "tables"), nil, map[string]interface{}{"name": runtime.Str("name")})
+	created, err := baseV3Call(runtime, "POST", baseV3Path("bases", baseToken, "tables"), nil, map[string]interface{}{
+		"table": map[string]interface{}{"name": runtime.Str("name")},
+	})
 	if err != nil {
 		return err
 	}
 	result := map[string]interface{}{"table": created}
 	tableIDValue := tableID(created)
+	if tableIDValue == "" {
+		if nested, ok := created["table"].(map[string]interface{}); ok {
+			tableIDValue = tableID(nested)
+			if tableIDValue != "" {
+				result["table"] = nested
+			}
+		}
+	}
 	if tableIDValue != "" && runtime.Str("fields") != "" {
 		fieldItems, err := parseJSONArray(runtime.Str("fields"), "fields")
 		if err != nil {

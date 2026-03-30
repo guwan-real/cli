@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/larksuite/cli/internal/output"
 	"github.com/larksuite/cli/shortcuts/common"
@@ -25,11 +26,11 @@ var BaseFormQuestionsUpdate = common.Shortcut{
 		{Name: "base-token", Desc: "Base token (base_token)", Required: true},
 		{Name: "table-id", Desc: "table ID", Required: true},
 		{Name: "form-id", Desc: "form ID", Required: true},
-		{Name: "questions", Desc: `questions JSON array, max 10 items, each item must include "id". Supported fields: "id"(required),"title","description"(plain text or markdown link like [text](https://example.com)),"required","option_display_mode"(0=dropdown,1=vertical,2=horizontal,select only). E.g. '[{"id":"q_001","title":"Updated?","required":true}]'`, Required: true},
+		{Name: "questions", Desc: `questions JSON array, each item must include "id". Supported fields: "id"(required),"title","description","required","visible","pre_field_id". E.g. '[{"id":"fld_xxx","title":"Updated?","required":true}]'`, Required: true},
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			PATCH("/open-apis/base/v3/bases/:base_token/tables/:table_id/forms/:form_id/questions").
+			PATCH("/open-apis/bitable/v1/apps/:base_token/tables/:table_id/forms/:form_id/fields/:field_id").
 			Set("base_token", runtime.Str("base-token")).
 			Set("table_id", runtime.Str("table-id")).
 			Set("form_id", runtime.Str("form-id"))
@@ -45,16 +46,20 @@ var BaseFormQuestionsUpdate = common.Shortcut{
 			return output.Errorf(output.ExitValidation, "invalid_json", "--questions must be a valid JSON array: %s", err)
 		}
 
-		data, err := baseV3Call(runtime, "PATCH",
-			baseV3Path("bases", baseToken, "tables", tableId, "forms", formId, "questions"),
-			nil, map[string]interface{}{"questions": questions})
-		if err != nil {
-			return err
-		}
-
-		items, _ := data["items"].([]interface{})
-		if len(items) == 0 {
-			items, _ = data["questions"].([]interface{})
+		items := make([]interface{}, 0, len(questions))
+		for idx, question := range questions {
+			m, _ := question.(map[string]interface{})
+			fieldIDValue, _ := m["id"].(string)
+			fieldIDValue = strings.TrimSpace(fieldIDValue)
+			if fieldIDValue == "" {
+				return output.Errorf(output.ExitValidation, "invalid_json", "--questions item %d must include non-empty string field \"id\"", idx+1)
+			}
+			delete(m, "id")
+			data, err := baseV3Call(runtime, "PATCH", baseFormPath(baseToken, tableId, formId, "fields", fieldIDValue), nil, m)
+			if err != nil {
+				return err
+			}
+			items = append(items, data)
 		}
 		outData := map[string]interface{}{"questions": items}
 
@@ -63,9 +68,10 @@ var BaseFormQuestionsUpdate = common.Shortcut{
 			for _, item := range items {
 				m, _ := item.(map[string]interface{})
 				rows = append(rows, map[string]interface{}{
-					"id":       m["id"],
+					"id":       fieldID(m),
 					"title":    m["title"],
 					"required": m["required"],
+					"visible":  m["visible"],
 				})
 			}
 			output.PrintTable(w, rows)

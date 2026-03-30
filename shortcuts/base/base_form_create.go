@@ -16,7 +16,7 @@ var BaseFormCreate = common.Shortcut{
 	Command:     "+form-create",
 	Description: "Create a form in a Base table",
 	Risk:        "write",
-	Scopes:      []string{"base:form:create"},
+	Scopes:      []string{"base:view:write_only"},
 	AuthTypes:   []string{"user", "bot"},
 	HasFormat:   true,
 	Flags: []common.Flag{
@@ -27,7 +27,8 @@ var BaseFormCreate = common.Shortcut{
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			POST("/open-apis/base/v3/bases/:base_token/tables/:table_id/forms").
+			POST("/open-apis/bitable/v1/apps/:base_token/tables/:table_id/views").
+			Body(map[string]interface{}{"view_name": runtime.Str("name"), "view_type": "form"}).
 			Set("base_token", runtime.Str("base-token")).
 			Set("table_id", runtime.Str("table-id"))
 	},
@@ -37,22 +38,27 @@ var BaseFormCreate = common.Shortcut{
 		name := runtime.Str("name")
 		description := runtime.Str("description")
 
-		body := map[string]interface{}{"name": name}
-		if description != "" {
-			body["description"] = description
-		}
-
 		data, err := baseV3Call(runtime, "POST",
-			baseV3Path("bases", baseToken, "tables", tableId, "forms"), nil, body)
+			baseV3Path("bases", baseToken, "tables", tableId, "views"), nil,
+			map[string]interface{}{"view_name": name, "view_type": "form"})
 		if err != nil {
 			return err
+		}
+		formID := viewID(data)
+		if description != "" && formID != "" {
+			updated, updateErr := baseV3Call(runtime, "PATCH", baseFormPath(baseToken, tableId, formID), nil, map[string]interface{}{"description": description})
+			if updateErr == nil {
+				data = updated
+			} else {
+				data["description_update_error"] = updateErr.Error()
+			}
 		}
 
 		runtime.OutFormat(data, nil, func(w io.Writer) {
 			output.PrintTable(w, []map[string]interface{}{
 				{
-					"id":          data["id"],
-					"name":        data["name"],
+					"id":          viewID(data),
+					"name":        viewName(data),
 					"description": data["description"],
 				},
 			})

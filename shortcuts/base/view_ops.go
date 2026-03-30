@@ -116,7 +116,7 @@ func dryRunViewSetCard(_ context.Context, runtime *common.RuntimeContext) *commo
 func dryRunViewRename(_ context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 	return dryRunViewBase(runtime).
 		PATCH("/open-apis/base/v3/bases/:base_token/tables/:table_id/views/:view_id").
-		Body(map[string]interface{}{"name": runtime.Str("name")})
+		Body(map[string]interface{}{"view_name": runtime.Str("name")})
 }
 
 func wrapViewPropertyBody(raw interface{}, key string) interface{} {
@@ -247,7 +247,7 @@ func executeViewRename(runtime *common.RuntimeContext) error {
 	baseToken := runtime.Str("base-token")
 	tableIDValue := baseTableID(runtime)
 	viewRef := runtime.Str("view-id")
-	data, err := baseV3Call(runtime, "PATCH", baseV3Path("bases", baseToken, "tables", tableIDValue, "views", viewRef), nil, map[string]interface{}{"name": runtime.Str("name")})
+	data, err := baseV3Call(runtime, "PATCH", baseV3Path("bases", baseToken, "tables", tableIDValue, "views", viewRef), nil, map[string]interface{}{"view_name": runtime.Str("name")})
 	if err != nil {
 		return err
 	}

@@ -14,7 +14,7 @@ var BaseFormDelete = common.Shortcut{
 	Command:     "+form-delete",
 	Description: "Delete a form in a Base table",
 	Risk:        "high-risk-write",
-	Scopes:      []string{"base:form:delete"},
+	Scopes:      []string{"base:view:write_only"},
 	AuthTypes:   []string{"user", "bot"},
 	HasFormat:   true,
 	Flags: []common.Flag{
@@ -24,7 +24,7 @@ var BaseFormDelete = common.Shortcut{
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			DELETE("/open-apis/base/v3/bases/:base_token/tables/:table_id/forms/:form_id").
+			DELETE("/open-apis/bitable/v1/apps/:base_token/tables/:table_id/views/:form_id").
 			Set("base_token", runtime.Str("base-token")).
 			Set("table_id", runtime.Str("table-id")).
 			Set("form_id", runtime.Str("form-id"))
@@ -35,7 +35,7 @@ var BaseFormDelete = common.Shortcut{
 		formId := runtime.Str("form-id")
 
 		_, err := baseV3Call(runtime, "DELETE",
-			baseV3Path("bases", baseToken, "tables", tableId, "forms", formId), nil, nil)
+			baseV3Path("bases", baseToken, "tables", tableId, "views", formId), nil, nil)
 		if err != nil {
 			return err
 		}

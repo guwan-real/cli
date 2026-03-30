@@ -5,14 +5,8 @@ package base
 
 import (
 	"context"
-	"fmt"
-	"net/http"
-	"strings"
-
-	larkcore "github.com/larksuite/oapi-sdk-go/v3/core"
-
-	"github.com/larksuite/cli/internal/validate"
 	"github.com/larksuite/cli/shortcuts/common"
+	"strings"
 )
 
 var BaseAdvpermDisable = common.Shortcut{
@@ -33,24 +27,16 @@ var BaseAdvpermDisable = common.Shortcut{
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			PUT("/open-apis/base/v3/bases/:base_token/advperm/enable?enable=false").
+			PUT("/open-apis/bitable/v1/apps/:base_token").
+			Body(map[string]interface{}{"is_advanced": false}).
 			Set("base_token", runtime.Str("base-token"))
 	},
 	Execute: func(ctx context.Context, runtime *common.RuntimeContext) error {
-		baseToken := runtime.Str("base-token")
-
-		queryParams := make(larkcore.QueryParams)
-		queryParams.Set("enable", "false")
-
-		apiResp, err := runtime.DoAPI(&larkcore.ApiReq{
-			HttpMethod:  http.MethodPut,
-			ApiPath:     fmt.Sprintf("/open-apis/base/v3/bases/%s/advperm/enable", validate.EncodePathSegment(baseToken)),
-			QueryParams: queryParams,
-		})
+		data, err := baseV3Call(runtime, "PUT", baseV3Path("bases", runtime.Str("base-token")), nil, map[string]interface{}{"is_advanced": false})
 		if err != nil {
 			return err
 		}
-
-		return handleRoleResponse(runtime, apiResp.RawBody, "disable advanced permissions failed")
+		runtime.Out(data, nil)
+		return nil
 	},
 }

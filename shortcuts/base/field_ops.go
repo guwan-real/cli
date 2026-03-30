@@ -139,7 +139,11 @@ func executeFieldGet(runtime *common.RuntimeContext) error {
 	baseToken := runtime.Str("base-token")
 	tableIDValue := baseTableID(runtime)
 	fieldRef := runtime.Str("field-id")
-	data, err := baseV3Call(runtime, "GET", baseV3Path("bases", baseToken, "tables", tableIDValue, "fields", fieldRef), nil, nil)
+	fields, _, err := listAllFields(runtime, baseToken, tableIDValue, 0, 200)
+	if err != nil {
+		return err
+	}
+	data, err := resolveFieldRef(fields, fieldRef)
 	if err != nil {
 		return err
 	}

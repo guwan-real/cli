@@ -26,7 +26,7 @@ var BaseFormGet = common.Shortcut{
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			GET("/open-apis/base/v3/bases/:base_token/tables/:table_id/forms/:form_id").
+			GET("/open-apis/bitable/v1/apps/:base_token/tables/:table_id/forms/:form_id").
 			Set("base_token", runtime.Str("base-token")).
 			Set("table_id", runtime.Str("table-id")).
 			Set("form_id", runtime.Str("form-id"))
@@ -36,8 +36,7 @@ var BaseFormGet = common.Shortcut{
 		tableId := runtime.Str("table-id")
 		formId := runtime.Str("form-id")
 
-		data, err := baseV3Call(runtime, "GET",
-			baseV3Path("bases", baseToken, "tables", tableId, "forms", formId), nil, nil)
+		data, err := baseV3Call(runtime, "GET", baseFormPath(baseToken, tableId, formId), nil, nil)
 		if err != nil {
 			return err
 		}
@@ -45,9 +44,12 @@ var BaseFormGet = common.Shortcut{
 		runtime.OutFormat(data, nil, func(w io.Writer) {
 			output.PrintTable(w, []map[string]interface{}{
 				{
-					"id":          data["id"],
-					"name":        data["name"],
-					"description": data["description"],
+					"id":                data["id"],
+					"name":              data["name"],
+					"description":       data["description"],
+					"shared":            data["shared"],
+					"shared_limit":      data["shared_limit"],
+					"submit_limit_once": data["submit_limit_once"],
 				},
 			})
 		})

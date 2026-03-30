@@ -27,7 +27,7 @@ var BaseFormQuestionsList = common.Shortcut{
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
 		return common.NewDryRunAPI().
-			GET("/open-apis/base/v3/bases/:base_token/tables/:table_id/forms/:form_id/questions").
+			GET("/open-apis/bitable/v1/apps/:base_token/tables/:table_id/forms/:form_id/fields").
 			Set("base_token", runtime.Str("base-token")).
 			Set("table_id", runtime.Str("table-id")).
 			Set("form_id", runtime.Str("form-id"))
@@ -37,16 +37,22 @@ var BaseFormQuestionsList = common.Shortcut{
 		tableId := runtime.Str("table-id")
 		formId := runtime.Str("form-id")
 
-		data, err := baseV3Call(runtime, "GET",
-			baseV3Path("bases", baseToken, "tables", tableId, "forms", formId, "questions"), nil, nil)
+		data, err := baseV3Call(runtime, "GET", baseFormPath(baseToken, tableId, formId, "fields"), nil, nil)
 		if err != nil {
 			return err
 		}
 
-		items, _ := data["questions"].([]interface{})
+		items, _ := data["items"].([]interface{})
+		if len(items) == 0 {
+			items, _ = data["fields"].([]interface{})
+		}
+		total := toInt(data["total"])
+		if total == 0 {
+			total = len(items)
+		}
 		outData := map[string]interface{}{
 			"questions": items,
-			"total":     data["total"],
+			"total":     total,
 		}
 
 		runtime.OutFormat(outData, nil, func(w io.Writer) {
@@ -58,14 +64,15 @@ var BaseFormQuestionsList = common.Shortcut{
 			for _, item := range items {
 				m, _ := item.(map[string]interface{})
 				rows = append(rows, map[string]interface{}{
-					"id":          m["id"],
+					"id":          fieldID(m),
 					"title":       m["title"],
 					"description": m["description"],
 					"required":    m["required"],
+					"visible":     m["visible"],
 				})
 			}
 			output.PrintTable(w, rows)
-			fmt.Fprintf(w, "\n%v question(s) total\n", data["total"])
+			fmt.Fprintf(w, "\n%d question(s) total\n", len(items))
 		})
 		return nil
 	},

@@ -5,22 +5,23 @@ package base
 
 import (
 	"context"
-	"encoding/json"
-	"github.com/larksuite/cli/shortcuts/common"
 	"strings"
+
+	"github.com/larksuite/cli/shortcuts/common"
 )
 
-var BaseRoleUpdate = common.Shortcut{
+var BaseMemberBatchDelete = common.Shortcut{
 	Service:     "base",
-	Command:     "+role-update",
-	Description: "Update a role config (delta merge, only changed fields needed)",
+	Command:     "+member-batch-delete",
+	Description: "Batch remove collaborators from a custom role",
 	Risk:        "high-risk-write",
 	Scopes:      []string{"base:role:update"},
 	AuthTypes:   []string{"user", "bot"},
+	HasFormat:   true,
 	Flags: []common.Flag{
 		{Name: "base-token", Desc: "base token", Required: true},
-		{Name: "role-id", Desc: "role ID (e.g. rolxxxxxx4)", Required: true},
-		{Name: "json", Desc: `body JSON (delta AdvPermBaseRoleConfig), e.g. {"role_name":"New Name","role_type":"custom_role","table_rule_map":{...}}`, Required: true},
+		{Name: "role-id", Desc: "role ID", Required: true},
+		{Name: "json", Desc: `member JSON array, e.g. '[{"type":"open_id","id":"ou_xxx"}]'`, Required: true},
 	},
 	Validate: func(ctx context.Context, runtime *common.RuntimeContext) error {
 		if strings.TrimSpace(runtime.Str("base-token")) == "" {
@@ -29,27 +30,25 @@ var BaseRoleUpdate = common.Shortcut{
 		if strings.TrimSpace(runtime.Str("role-id")) == "" {
 			return common.FlagErrorf("--role-id must not be blank")
 		}
-		var body map[string]any
-		if err := json.Unmarshal([]byte(runtime.Str("json")), &body); err != nil {
-			return common.FlagErrorf("--json must be valid JSON: %v", err)
+		if _, err := parseJSONArray(runtime.Str("json"), "json"); err != nil {
+			return err
 		}
 		return nil
 	},
 	DryRun: func(ctx context.Context, runtime *common.RuntimeContext) *common.DryRunAPI {
-		var body map[string]any
-		json.Unmarshal([]byte(runtime.Str("json")), &body)
+		members, _ := parseJSONArray(runtime.Str("json"), "json")
 		return common.NewDryRunAPI().
-			Desc("Delta merge: only changed fields are updated, others remain unchanged").
-			PUT("/open-apis/bitable/v1/apps/:base_token/roles/:role_id").
-			Body(body).
+			POST("/open-apis/bitable/v1/apps/:base_token/roles/:role_id/members/batch_delete").
+			Body(map[string]interface{}{"member_list": members}).
 			Set("base_token", runtime.Str("base-token")).
 			Set("role_id", runtime.Str("role-id"))
 	},
 	Execute: func(ctx context.Context, runtime *common.RuntimeContext) error {
-		var body map[string]any
-		json.Unmarshal([]byte(runtime.Str("json")), &body)
-
-		data, err := baseV3Call(runtime, "PUT", baseRolePath(runtime.Str("base-token"), runtime.Str("role-id")), nil, body)
+		members, err := parseJSONArray(runtime.Str("json"), "json")
+		if err != nil {
+			return err
+		}
+		data, err := baseV3Call(runtime, "POST", baseRolePath(runtime.Str("base-token"), runtime.Str("role-id"), "members", "batch_delete"), nil, map[string]interface{}{"member_list": members})
 		if err != nil {
 			return err
 		}
