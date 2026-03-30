@@ -80,7 +80,7 @@ func authCheckRun(opts *CheckOptions) error {
 	ok := len(missing) == 0
 	result := map[string]interface{}{"ok": ok, "granted": granted, "missing": missing}
 	if len(missing) > 0 {
-		result["suggestion"] = fmt.Sprintf(`lark-cli auth login --scope "%s"`, strings.Join(missing, " "))
+		result["suggestion"] = fmt.Sprintf(`xfchat_cli auth login --scope "%s"`, strings.Join(missing, " "))
 	}
 	output.PrintJson(f.IOStreams.Out, result)
 	if !ok {

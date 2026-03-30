@@ -29,7 +29,7 @@ import (
 // discover the identity-first workflow without needing skill documentation.
 func hintIdentityFirst(runtime *common.RuntimeContext, mailboxID string) {
 	fmt.Fprintf(runtime.IO().ErrOut,
-		"tip: run \"lark-cli mail user_mailboxes profile --params '{\"user_mailbox_id\":\"%s\"}'\" to confirm your email identity\n",
+		"tip: run \"xfchat_cli mail user_mailboxes profile --params '{\"user_mailbox_id\":\"%s\"}'\" to confirm your email identity\n",
 		sanitizeForTerminal(mailboxID))
 }
 
@@ -38,7 +38,7 @@ func hintIdentityFirst(runtime *common.RuntimeContext, mailboxID string) {
 func hintSendDraft(runtime *common.RuntimeContext, mailboxID, draftID string) {
 	fmt.Fprintf(runtime.IO().ErrOut,
 		"tip: draft saved. To send this draft, run:\n"+
-			`  lark-cli mail user_mailbox.drafts send --params '{"user_mailbox_id":"%s","draft_id":"%s"}'`+"\n",
+			`  xfchat_cli mail user_mailbox.drafts send --params '{"user_mailbox_id":"%s","draft_id":"%s"}'`+"\n",
 		sanitizeForTerminal(mailboxID), sanitizeForTerminal(draftID))
 }
 
@@ -46,7 +46,7 @@ func hintSendDraft(runtime *common.RuntimeContext, mailboxID, draftID string) {
 // original message as read after a reply/reply-all/forward operation.
 func hintMarkAsRead(runtime *common.RuntimeContext, mailboxID, originalMessageID string) {
 	fmt.Fprintf(runtime.IO().ErrOut,
-		"tip: mark original as read? lark-cli mail user_mailbox.messages batch_modify_message"+
+		"tip: mark original as read? xfchat_cli mail user_mailbox.messages batch_modify_message"+
 			` --params '{"user_mailbox_id":"%s"}' --data '{"message_ids":["%s"],"remove_label_ids":["UNREAD"]}'`+"\n",
 		sanitizeForTerminal(mailboxID), sanitizeForTerminal(originalMessageID))
 }
@@ -814,9 +814,9 @@ func resolveLookupHint(kind, mailboxID string) string {
 	}
 	switch kind {
 	case "folder":
-		return fmt.Sprintf("Run `lark-cli mail user_mailbox.folders list --params '{\"user_mailbox_id\":\"%s\"}'` to inspect available folder IDs and names.", mailboxID)
+		return fmt.Sprintf("Run `xfchat_cli mail user_mailbox.folders list --params '{\"user_mailbox_id\":\"%s\"}'` to inspect available folder IDs and names.", mailboxID)
 	case "label":
-		return fmt.Sprintf("Run `lark-cli api GET '/open-apis/mail/v1/user_mailboxes/%s/labels' --as user` to inspect available label IDs and names.", validate.EncodePathSegment(mailboxID))
+		return fmt.Sprintf("Run `xfchat_cli api GET '/open-apis/mail/v1/user_mailboxes/%s/labels' --as user` to inspect available label IDs and names.", validate.EncodePathSegment(mailboxID))
 	default:
 		return ""
 	}

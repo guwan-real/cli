@@ -42,7 +42,7 @@ func configShowRun(opts *ConfigShowOptions) error {
 	config, err := core.LoadMultiAppConfig()
 	if err != nil || config == nil || len(config.Apps) == 0 {
 		fmt.Fprintf(f.IOStreams.ErrOut, "Not configured yet. Config file path: %s\n", core.GetConfigPath())
-		fmt.Fprintln(f.IOStreams.ErrOut, "Run `lark-cli config init` to initialize.")
+		fmt.Fprintln(f.IOStreams.ErrOut, "Run `xfchat_cli config init` to initialize.")
 		return nil
 	}
 	app := config.Apps[0]

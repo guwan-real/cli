@@ -6,7 +6,7 @@ const os = require("os");
 
 const VERSION = require("../package.json").version;
 const REPO = "larksuite/cli";
-const NAME = "lark-cli";
+const NAME = "xfchat_cli";
 
 const PLATFORM_MAP = {
   darwin: "darwin",
@@ -66,7 +66,7 @@ function download(url, destPath) {
 }
 
 async function install() {
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "lark-cli-"));
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "xfchat_cli-"));
   const archivePath = path.join(tmpDir, archiveName);
 
   try {

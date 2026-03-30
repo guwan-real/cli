@@ -61,7 +61,7 @@ var loginMsgZh = &loginMsg{
 	HintCommon2: "  --domain all                    授权所有已知域的权限",
 	HintCommon3: "  --domain calendar,task          授权日历和任务域的权限",
 	HintCommon4: "  --domain calendar --recommend   授权日历域的推荐权限",
-	HintFooter:  "  lark-cli auth login --help",
+	HintFooter:  "  xfchat_cli auth login --help",
 }
 
 var loginMsgEn = &loginMsg{
@@ -90,7 +90,7 @@ var loginMsgEn = &loginMsg{
 	HintCommon2: "  --domain all                    authorize all known domain scopes",
 	HintCommon3: "  --domain calendar,task          authorize calendar and task scopes",
 	HintCommon4: "  --domain calendar --recommend   authorize calendar recommended scopes",
-	HintFooter:  "  lark-cli auth login --help",
+	HintFooter:  "  xfchat_cli auth login --help",
 }
 
 func getLoginMsg(lang string) *loginMsg {

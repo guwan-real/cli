@@ -22,7 +22,7 @@ func NewCmdConfigDefaultAs(f *cmdutil.Factory) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			multi, err := core.LoadMultiAppConfig()
 			if err != nil {
-				return output.ErrWithHint(output.ExitValidation, "config", "not configured", "run: lark-cli config init")
+				return output.ErrWithHint(output.ExitValidation, "config", "not configured", "run: xfchat_cli config init")
 			}
 
 			if len(args) == 0 {

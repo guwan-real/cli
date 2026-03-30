@@ -372,7 +372,7 @@ func buildDraftEditPatchTemplate() map[string]interface{} {
 			"`replace_inline` keeps the original filename and content_type when those fields are omitted",
 			"protected headers require `allow_protected_header_edits=true`",
 		},
-		"command_example":    "lark-cli mail +draft-edit --print-patch-template",
-		"patch_file_example": "lark-cli mail +draft-edit --draft-id d_xxx --patch-file ./patch.json",
+		"command_example":    "xfchat_cli mail +draft-edit --print-patch-template",
+		"patch_file_example": "xfchat_cli mail +draft-edit --draft-id d_xxx --patch-file ./patch.json",
 	}
 }

@@ -158,7 +158,7 @@ func PollAppRegistration(ctx context.Context, httpClient *http.Client, brand cor
 
 		resp, err := httpClient.Do(req)
 		if err != nil {
-			fmt.Fprintf(errOut, "[lark-cli] [WARN] app-registration: poll network error: %v\n", err)
+			fmt.Fprintf(errOut, "[xfchat_cli] [WARN] app-registration: poll network error: %v\n", err)
 			currentInterval = minInt(currentInterval+1, maxPollInterval)
 			continue
 		}
@@ -166,14 +166,14 @@ func PollAppRegistration(ctx context.Context, httpClient *http.Client, brand cor
 		body, err := io.ReadAll(resp.Body)
 		resp.Body.Close()
 		if err != nil {
-			fmt.Fprintf(errOut, "[lark-cli] [WARN] app-registration: poll read error: %v\n", err)
+			fmt.Fprintf(errOut, "[xfchat_cli] [WARN] app-registration: poll read error: %v\n", err)
 			currentInterval = minInt(currentInterval+1, maxPollInterval)
 			continue
 		}
 
 		var data map[string]interface{}
 		if err := json.Unmarshal(body, &data); err != nil {
-			fmt.Fprintf(errOut, "[lark-cli] [WARN] app-registration: poll parse error: %v\n", err)
+			fmt.Fprintf(errOut, "[xfchat_cli] [WARN] app-registration: poll parse error: %v\n", err)
 			currentInterval = minInt(currentInterval+1, maxPollInterval)
 			continue
 		}
@@ -200,7 +200,7 @@ func PollAppRegistration(ctx context.Context, httpClient *http.Client, brand cor
 			continue
 		case "slow_down":
 			currentInterval = minInt(currentInterval+5, maxPollInterval)
-			fmt.Fprintf(errOut, "[lark-cli] app-registration: slow_down, interval increased to %ds\n", currentInterval)
+			fmt.Fprintf(errOut, "[xfchat_cli] app-registration: slow_down, interval increased to %ds\n", currentInterval)
 			continue
 		case "access_denied":
 			return nil, fmt.Errorf("app registration denied by user")
@@ -219,7 +219,7 @@ func PollAppRegistration(ctx context.Context, httpClient *http.Client, brand cor
 	}
 
 	if attempts >= maxPollAttempts {
-		fmt.Fprintf(errOut, "[lark-cli] [WARN] app-registration: max poll attempts (%d) reached\n", maxPollAttempts)
+		fmt.Fprintf(errOut, "[xfchat_cli] [WARN] app-registration: max poll attempts (%d) reached\n", maxPollAttempts)
 	}
 	return nil, fmt.Errorf("app registration timed out, please try again")
 }

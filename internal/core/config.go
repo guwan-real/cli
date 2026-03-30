@@ -60,6 +60,9 @@ type CliConfig struct {
 // If the home directory cannot be determined, it falls back to a relative path
 // and prints a warning to stderr.
 func GetConfigDir() string {
+	if dir := os.Getenv("XFCHAT_CLI_CONFIG_DIR"); dir != "" {
+		return dir
+	}
 	if dir := os.Getenv("LARKSUITE_CLI_CONFIG_DIR"); dir != "" {
 		return dir
 	}
@@ -67,7 +70,7 @@ func GetConfigDir() string {
 	if err != nil || home == "" {
 		fmt.Fprintf(os.Stderr, "warning: unable to determine home directory: %v\n", err)
 	}
-	return filepath.Join(home, ".lark-cli")
+	return filepath.Join(home, ".xfchat_cli")
 }
 
 // GetConfigPath returns the config file path.
@@ -109,7 +112,7 @@ func SaveMultiAppConfig(config *MultiAppConfig) error {
 func RequireConfig(kc keychain.KeychainAccess) (*CliConfig, error) {
 	raw, err := LoadMultiAppConfig()
 	if err != nil || raw == nil || len(raw.Apps) == 0 {
-		return nil, &ConfigError{Code: 2, Type: "config", Message: "not configured", Hint: "run `lark-cli config init --new` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete setup."}
+		return nil, &ConfigError{Code: 2, Type: "config", Message: "not configured", Hint: "run `xfchat_cli config init --new` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete setup."}
 	}
 	app := raw.Apps[0]
 	if app.Endpoints != nil {
@@ -139,7 +142,7 @@ func RequireAuth(kc keychain.KeychainAccess) (*CliConfig, error) {
 		return nil, err
 	}
 	if cfg.UserOpenId == "" {
-		return nil, &ConfigError{Code: 3, Type: "auth", Message: "not logged in", Hint: "run `lark-cli auth login` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login."}
+		return nil, &ConfigError{Code: 3, Type: "auth", Message: "not logged in", Hint: "run `xfchat_cli auth login` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login."}
 	}
 	return cfg, nil
 }

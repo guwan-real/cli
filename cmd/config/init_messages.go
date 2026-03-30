@@ -32,7 +32,7 @@ var initMsgZh = &initMsg{
 	Feishu:             "飞书",
 	ScanOrOpenLink:     "\n打开以下链接配置应用:\n\n",
 	WaitingForScan:     "等待配置应用...",
-	DetectedLarkTenant: "[lark-cli] 检测到 Lark 租户，切换端点重试...",
+	DetectedLarkTenant: "[xfchat_cli] 检测到 Lark 租户，切换端点重试...",
 	AppCreated:         "应用配置成功! App ID: %s",
 	ConfigSaved:        "应用配置成功! App ID: %s",
 }
@@ -46,7 +46,7 @@ var initMsgEn = &initMsg{
 	Feishu:             "Feishu",
 	ScanOrOpenLink:     "\nOpen the link below to configure app:\n\n",
 	WaitingForScan:     "Waiting for app configuration...",
-	DetectedLarkTenant: "[lark-cli] Detected Lark tenant, switching endpoint...",
+	DetectedLarkTenant: "[xfchat_cli] Detected Lark tenant, switching endpoint...",
 	AppCreated:         "App configured! App ID: %s",
 	ConfigSaved:        "App configured! App ID: %s",
 }

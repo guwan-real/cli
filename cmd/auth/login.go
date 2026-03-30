@@ -243,7 +243,7 @@ func authLoginRun(opts *LoginOptions) error {
 			"verification_url": authResp.VerificationUriComplete,
 			"device_code":      authResp.DeviceCode,
 			"expires_in":       authResp.ExpiresIn,
-			"hint":             fmt.Sprintf("Show verification_url to user, then immediately execute: lark-cli auth login --device-code %s (blocks until authorized or timeout). Do not instruct the user to run this command themselves.", authResp.DeviceCode),
+			"hint":             fmt.Sprintf("Show verification_url to user, then immediately execute: xfchat_cli auth login --device-code %s (blocks until authorized or timeout). Do not instruct the user to run this command themselves.", authResp.DeviceCode),
 		})
 		fmt.Fprintln(f.IOStreams.Out, string(b))
 		return nil

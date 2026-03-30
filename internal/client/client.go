@@ -79,7 +79,7 @@ func (c *APIClient) DoSDKRequest(ctx context.Context, req *larkcore.ApiReq, as c
 	} else {
 		req.SupportedAccessTokenTypes = []larkcore.AccessTokenType{larkcore.AccessTokenTypeUser}
 		if c.Config.UserOpenId == "" {
-			return nil, fmt.Errorf("login required: lark-cli auth login (or use --as bot)")
+			return nil, fmt.Errorf("login required: xfchat_cli auth login (or use --as bot)")
 		}
 		token, err := auth.GetValidAccessToken(c.HTTP, auth.NewUATCallOptions(c.Config, c.ErrOut))
 		if err != nil {

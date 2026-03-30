@@ -10,7 +10,7 @@ const (
 	// (both AppSecret and UAT). Entries are distinguished by account key format:
 	//   - AppSecret: "appsecret:<appId>"
 	//   - UAT:       "<appId>:<userOpenId>"
-	LarkCliService = "lark-cli"
+	LarkCliService = "xfchat_cli"
 )
 
 // KeychainAccess abstracts keychain Get/Set/Remove for dependency injection.

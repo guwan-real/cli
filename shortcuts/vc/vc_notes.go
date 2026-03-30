@@ -451,7 +451,7 @@ var VCNotes = common.Shortcut{
 				if missing := auth.MissingScopes(stored.Scope, required); len(missing) > 0 {
 					return output.ErrWithHint(output.ExitAuth, "missing_scope",
 						fmt.Sprintf("missing required scope(s): %s", strings.Join(missing, ", ")),
-						fmt.Sprintf("run `lark-cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", strings.Join(missing, " ")))
+						fmt.Sprintf("run `xfchat_cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", strings.Join(missing, " ")))
 				}
 			}
 		}

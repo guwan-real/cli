@@ -29,7 +29,7 @@ const tagBytes = 16
 func StorageDir(service string) string {
 	home, err := os.UserHomeDir()
 	if err != nil || home == "" {
-		return filepath.Join(".lark-cli", "keychain", service)
+		return filepath.Join(".xfchat_cli", "keychain", service)
 	}
 	return filepath.Join(home, "Library", "Application Support", service)
 }

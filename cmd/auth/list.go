@@ -42,13 +42,13 @@ func authListRun(opts *ListOptions) error {
 
 	multi, _ := core.LoadMultiAppConfig()
 	if multi == nil || len(multi.Apps) == 0 {
-		fmt.Fprintln(f.IOStreams.ErrOut, "Not configured yet. Run `lark-cli config init` to initialize.")
+		fmt.Fprintln(f.IOStreams.ErrOut, "Not configured yet. Run `xfchat_cli config init` to initialize.")
 		return nil
 	}
 
 	app := multi.Apps[0]
 	if len(app.Users) == 0 {
-		fmt.Fprintln(f.IOStreams.ErrOut, "No logged-in users. Run `lark-cli auth login` to log in.")
+		fmt.Fprintln(f.IOStreams.ErrOut, "No logged-in users. Run `xfchat_cli auth login` to log in.")
 		return nil
 	}
 

@@ -1,9 +1,9 @@
 {
-  "name": "@larksuite/cli",
+  "name": "xfchat_cli",
   "version": "1.0.0",
   "description": "The official CLI for Lark/Feishu open platform",
   "bin": {
-    "lark-cli": "scripts/run.js"
+    "xfchat_cli": "scripts/run.js"
   },
   "scripts": {
     "postinstall": "node scripts/install.js"

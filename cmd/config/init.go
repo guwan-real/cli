@@ -219,7 +219,7 @@ func configInitRun(opts *ConfigInitOptions) error {
 
 	// Non-terminal: cannot run interactive mode, guide user to --new
 	if !f.IOStreams.IsTerminal {
-		return output.ErrValidation("config init requires a terminal for interactive mode. Run with --new to create a new app:\n  lark-cli config init --new\nThis command blocks until setup is complete and outputs a verification URL. Run it in the background, then retrieve the URL from its output.")
+		return output.ErrValidation("config init requires a terminal for interactive mode. Run with --new to create a new app:\n  xfchat_cli config init --new\nThis command blocks until setup is complete and outputs a verification URL. Run it in the background, then retrieve the URL from its output.")
 	}
 
 	// Mode 5: Legacy interactive (readline fallback)

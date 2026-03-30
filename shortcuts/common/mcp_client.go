@@ -164,7 +164,7 @@ func classifyMCPMessageError(msg string, detail interface{}) error {
 			Detail: &output.ErrDetail{
 				Type:    "auth",
 				Message: msg,
-				Hint:    "run `lark-cli auth login` in the background to re-authorize. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.",
+				Hint:    "run `xfchat_cli auth login` in the background to re-authorize. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.",
 				Detail:  detail,
 			},
 		}

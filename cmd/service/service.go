@@ -134,7 +134,7 @@ func NewCmdServiceMethod(f *cmdutil.Factory, spec, method map[string]interface{}
 	cmd := &cobra.Command{
 		Use:   name,
 		Short: desc,
-		Long:  fmt.Sprintf("%s\n\nView parameter definitions before calling:\n  lark-cli schema %s", desc, schemaPath),
+		Long:  fmt.Sprintf("%s\n\nView parameter definitions before calling:\n  xfchat_cli schema %s", desc, schemaPath),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			opts.Cmd = cmd
 			opts.Ctx = cmd.Context()
@@ -257,7 +257,7 @@ func checkServiceScopes(config *core.CliConfig, method map[string]interface{}, s
 			if missing := auth.MissingScopes(stored.Scope, required); len(missing) > 0 {
 				return output.ErrWithHint(output.ExitAuth, "missing_scope",
 					fmt.Sprintf("missing required scope(s): %s", strings.Join(missing, ", ")),
-					fmt.Sprintf("run `lark-cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", strings.Join(missing, " ")))
+					fmt.Sprintf("run `xfchat_cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", strings.Join(missing, " ")))
 			}
 		}
 		return nil
@@ -284,7 +284,7 @@ func checkServiceScopes(config *core.CliConfig, method map[string]interface{}, s
 	recommended := registry.SelectRecommendedScope(scopes, "user")
 	return output.ErrWithHint(output.ExitAPI, "permission",
 		fmt.Sprintf("insufficient permissions (required scope: %s)", recommended),
-		fmt.Sprintf(`run `+"`"+`lark-cli auth login --scope "%s"`+"`"+` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.`, recommended))
+		fmt.Sprintf(`run `+"`"+`xfchat_cli auth login --scope "%s"`+"`"+` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.`, recommended))
 }
 
 // buildServiceRequest parses flags, builds the URL with path/query params, and returns a RawApiRequest.
@@ -315,7 +315,7 @@ func buildServiceRequest(opts *ServiceMethodOptions) (client.RawApiRequest, erro
 		if !ok || util.IsEmptyValue(val) {
 			return client.RawApiRequest{}, output.ErrWithHint(output.ExitValidation, "validation",
 				fmt.Sprintf("missing required path parameter: %s", name),
-				fmt.Sprintf("lark-cli schema %s", schemaPath))
+				fmt.Sprintf("xfchat_cli schema %s", schemaPath))
 		}
 		valStr := fmt.Sprintf("%v", val)
 		if err := validate.ResourceName(valStr, name); err != nil {
@@ -337,7 +337,7 @@ func buildServiceRequest(opts *ServiceMethodOptions) (client.RawApiRequest, erro
 		if required && !isPaginationParam && (!exists || util.IsEmptyValue(value)) {
 			return client.RawApiRequest{}, output.ErrWithHint(output.ExitValidation, "validation",
 				fmt.Sprintf("missing required query parameter: %s", name),
-				fmt.Sprintf("lark-cli schema %s", schemaPath))
+				fmt.Sprintf("xfchat_cli schema %s", schemaPath))
 		}
 		if exists && !util.IsEmptyValue(value) {
 			queryParams[name] = value
@@ -393,7 +393,7 @@ func scopeAwareChecker(scopes []interface{}, isBotMode bool) func(interface{}) e
 			recommended := registry.SelectRecommendedScope(scopes, identity)
 			return output.ErrWithHint(output.ExitAPI, "permission",
 				fmt.Sprintf("insufficient permissions: [%d] %s", larkCode, msg),
-				fmt.Sprintf(`run `+"`"+`lark-cli auth login --scope "%s"`+"`"+` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.`, recommended))
+				fmt.Sprintf(`run `+"`"+`xfchat_cli auth login --scope "%s"`+"`"+` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.`, recommended))
 		}
 
 		return output.ErrAPI(larkCode, fmt.Sprintf("API error: [%d] %s", larkCode, msg), resultMap["error"])

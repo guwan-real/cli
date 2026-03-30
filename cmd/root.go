@@ -28,25 +28,25 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const rootLong = `lark-cli — Lark/Feishu CLI tool.
+const rootLong = `xfchat_cli — Lark/Feishu CLI tool.
 
 USAGE:
-    lark-cli <command> [subcommand] [method] [options]
-    lark-cli api <method> <path> [--params <json>] [--data <json>]
-    lark-cli schema <service.resource.method> [--format pretty]
+    xfchat_cli <command> [subcommand] [method] [options]
+    xfchat_cli api <method> <path> [--params <json>] [--data <json>]
+    xfchat_cli schema <service.resource.method> [--format pretty]
 
 EXAMPLES:
     # View upcoming events
-    lark-cli calendar +agenda
+    xfchat_cli calendar +agenda
 
     # List calendar events
-    lark-cli calendar events list --params '{"calendar_id":"primary"}'
+    xfchat_cli calendar events list --params '{"calendar_id":"primary"}'
 
     # Search users
-    lark-cli contact +search-user --query "John"
+    xfchat_cli contact +search-user --query "John"
 
     # Generic API call
-    lark-cli api GET /open-apis/calendar/v4/calendars
+    xfchat_cli api GET /open-apis/calendar/v4/calendars
 
 FLAGS:
     --params <json>       URL/query parameters JSON
@@ -61,7 +61,7 @@ FLAGS:
     --dry-run             print request without executing
 
 AI AGENT SKILLS:
-    lark-cli pairs with AI agent skills (Claude Code, etc.) that
+    xfchat_cli pairs with AI agent skills (Claude Code, etc.) that
     teach the agent Lark API patterns, best practices, and workflows.
 
     Install all skills:
@@ -78,14 +78,14 @@ COMMUNITY:
     Issues:     https://github.com/larksuite/cli/issues
     Docs:       https://open.feishu.cn/document/
 
-More help: lark-cli <command> --help`
+More help: xfchat_cli <command> --help`
 
 // Execute runs the root command and returns the process exit code.
 func Execute() int {
 	f := cmdutil.NewDefault()
 
 	rootCmd := &cobra.Command{
-		Use:     "lark-cli",
+		Use:     "xfchat_cli",
 		Short:   "Lark/Feishu CLI — OAuth authorization, UAT management, API calls",
 		Long:    rootLong,
 		Version: build.Version,
@@ -260,7 +260,7 @@ func enrichPermissionError(f *cmdutil.Factory, exitErr *output.ExitError) {
 		if isBot {
 			exitErr.Detail.Hint = "enable the scope in developer console (see console_url)"
 		} else {
-			exitErr.Detail.Hint = fmt.Sprintf("run `lark-cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", recommended)
+			exitErr.Detail.Hint = fmt.Sprintf("run `xfchat_cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", recommended)
 		}
 		exitErr.Detail.ConsoleURL = consoleURL
 
@@ -277,7 +277,7 @@ func enrichPermissionError(f *cmdutil.Factory, exitErr *output.ExitError) {
 			exitErr.Detail.Hint = "enable the scope in developer console (see console_url)"
 		} else {
 			exitErr.Detail.Hint = fmt.Sprintf(
-				"enable scope in console (see console_url), or run `lark-cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", recommended)
+				"enable scope in console (see console_url), or run `xfchat_cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", recommended)
 		}
 		exitErr.Detail.ConsoleURL = consoleURL
 	}

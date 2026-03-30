@@ -1,4 +1,4 @@
-# lark-cli
+# xfchat_cli
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/go-%3E%3D1.23-blue.svg)](https://go.dev/)
@@ -10,7 +10,7 @@ A command-line tool for [Lark/Feishu](https://www.larksuite.com/) Open Platform 
 
 [Install](#installation--quick-start) · [AI Agent Skills](#agent-skills) · [Auth](#authentication) · [Commands](#three-layer-command-system) · [Advanced](#advanced-usage) · [Security](#security--risk-warnings-read-before-use) · [Contributing](#contributing)
 
-## Why lark-cli?
+## Why xfchat_cli?
 
 - **Agent-Native Design** — 19 structured [Skills](./skills/) out of the box, compatible with popular AI tools — Agents can operate Lark with zero extra setup
 - **Wide Coverage** — 11 business domains, 200+ curated commands, 19 AI Agent [Skills](./skills/)
@@ -57,7 +57,7 @@ Choose **one** of the following methods:
 
 ```bash
 # Install CLI
-npm install -g @larksuite/cli
+npm install -g xfchat_cli
 
 # Install CLI SKILL (required)
 npx skills add larksuite/cli -y -g
@@ -80,13 +80,13 @@ npx skills add larksuite/cli -y -g
 
 ```bash
 # 1. Configure app credentials (one-time, interactive guided setup)
-lark-cli config init
+xfchat_cli config init
 
 # 2. Log in (--recommend auto-selects commonly used scopes)
-lark-cli auth login --recommend
+xfchat_cli auth login --recommend
 
 # 3. Start using
-lark-cli calendar +agenda
+xfchat_cli calendar +agenda
 ```
 
 ## Quick Start (AI Agent)
@@ -97,7 +97,7 @@ lark-cli calendar +agenda
 
 ```bash
 # Install CLI
-npm install -g @larksuite/cli
+npm install -g xfchat_cli
 
 # Install CLI SKILL (required)
 npx skills add larksuite/cli -y -g
@@ -108,7 +108,7 @@ npx skills add larksuite/cli -y -g
 > Run this command in the background. It will output an authorization URL — extract it and send it to the user. The command exits automatically after the user completes the setup in the browser.
 
 ```bash
-lark-cli config init --new
+xfchat_cli config init --new
 ```
 
 **Step 3 — Login**
@@ -116,13 +116,13 @@ lark-cli config init --new
 > Same as above: run in the background, extract the authorization URL and send it to the user.
 
 ```bash
-lark-cli auth login --recommend
+xfchat_cli auth login --recommend
 ```
 
 **Step 4 — Verify**
 
 ```bash
-lark-cli auth status
+xfchat_cli auth status
 ```
 
 ## Agent Skills
@@ -162,25 +162,25 @@ lark-cli auth status
 
 ```bash
 # Interactive login (TUI guides domain and permission level selection)
-lark-cli auth login
+xfchat_cli auth login
 
 # Filter by domain
-lark-cli auth login --domain calendar,task
+xfchat_cli auth login --domain calendar,task
 
 # Recommended auto-approval scopes
-lark-cli auth login --recommend
+xfchat_cli auth login --recommend
 
 # Exact scope
-lark-cli auth login --scope "calendar:calendar:readonly"
+xfchat_cli auth login --scope "calendar:calendar:readonly"
 
 # Agent mode: return verification URL immediately, non-blocking
-lark-cli auth login --domain calendar --no-wait
+xfchat_cli auth login --domain calendar --no-wait
 # Resume polling later
-lark-cli auth login --device-code <DEVICE_CODE>
+xfchat_cli auth login --device-code <DEVICE_CODE>
 
 # Identity switching: execute commands as user or bot
-lark-cli calendar +agenda --as user
-lark-cli im +messages-send --as bot --chat-id "oc_xxx" --text "Hello"
+xfchat_cli calendar +agenda --as user
+xfchat_cli im +messages-send --as bot --chat-id "oc_xxx" --text "Hello"
 ```
 
 ## Three-Layer Command System
@@ -192,20 +192,20 @@ The CLI provides three levels of granularity, covering everything from quick ope
 Prefixed with `+`, designed to be friendly for both humans and AI, with smart defaults, table output, and dry-run previews.
 
 ```bash
-lark-cli calendar +agenda
-lark-cli im +messages-send --chat-id "oc_xxx" --text "Hello"
-lark-cli docs +create --title "Weekly Report" --markdown "# Progress\n- Completed feature X"
+xfchat_cli calendar +agenda
+xfchat_cli im +messages-send --chat-id "oc_xxx" --text "Hello"
+xfchat_cli docs +create --title "Weekly Report" --markdown "# Progress\n- Completed feature X"
 ```
 
-Run `lark-cli <service> --help` to see all shortcut commands.
+Run `xfchat_cli <service> --help` to see all shortcut commands.
 
 ### 2. API Commands
 
 Auto-generated from Lark OAPI metadata, curated through evaluation and quality gates — 100+ commands mapped 1:1 to platform endpoints.
 
 ```bash
-lark-cli calendar calendars list
-lark-cli calendar events instance_view --params '{"calendar_id":"primary","start_time":"1700000000","end_time":"1700086400"}'
+xfchat_cli calendar calendars list
+xfchat_cli calendar events instance_view --params '{"calendar_id":"primary","start_time":"1700000000","end_time":"1700086400"}'
 ```
 
 ### 3. Raw API Calls
@@ -213,8 +213,8 @@ lark-cli calendar events instance_view --params '{"calendar_id":"primary","start
 Call any Lark Open Platform endpoint directly, covering 2500+ APIs.
 
 ```bash
-lark-cli api GET /open-apis/calendar/v4/calendars
-lark-cli api POST /open-apis/im/v1/messages --params '{"receive_id_type":"chat_id"}' --body '{"receive_id":"oc_xxx","msg_type":"text","content":"{\"text\":\"Hello\"}"}'
+xfchat_cli api GET /open-apis/calendar/v4/calendars
+xfchat_cli api POST /open-apis/im/v1/messages --params '{"receive_id_type":"chat_id"}' --body '{"receive_id":"oc_xxx","msg_type":"text","content":"{\"text\":\"Hello\"}"}'
 ```
 
 ## Advanced Usage
@@ -242,7 +242,7 @@ lark-cli api POST /open-apis/im/v1/messages --params '{"receive_id_type":"chat_i
 For commands that may have side effects, preview the request with --dry-run first:
 
 ```bash
-lark-cli im +messages-send --chat-id oc_xxx --text "hello" --dry-run
+xfchat_cli im +messages-send --chat-id oc_xxx --text "hello" --dry-run
 ```
 
 ### Schema Introspection
@@ -250,9 +250,9 @@ lark-cli im +messages-send --chat-id oc_xxx --text "hello" --dry-run
 Use schema to inspect any API method's parameters, request body, response structure, supported identities, and scopes:
 
 ```bash
-lark-cli schema
-lark-cli schema calendar.events.instance_view
-lark-cli schema im.messages.delete
+xfchat_cli schema
+xfchat_cli schema calendar.events.instance_view
+xfchat_cli schema im.messages.delete
 ```
 
 ## Security & Risk Warnings (Read Before Use)

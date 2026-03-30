@@ -42,18 +42,18 @@ func ClassifyLarkError(code int, msg string) (int, string, string) {
 	switch code {
 	// auth: token missing / invalid / expired
 	case LarkErrTokenMissing, LarkErrTokenBadFmt:
-		return ExitAuth, "auth", "run: lark-cli auth login to re-authorize"
+		return ExitAuth, "auth", "run: xfchat_cli auth login to re-authorize"
 	case LarkErrTokenInvalid, LarkErrATInvalid, LarkErrTokenExpired:
-		return ExitAuth, "auth", "run: lark-cli auth login to re-authorize"
+		return ExitAuth, "auth", "run: xfchat_cli auth login to re-authorize"
 
 	// permission: scope not granted
 	case LarkErrAppScopeNotEnabled, LarkErrTokenNoPermission,
 		LarkErrUserScopeInsufficient, LarkErrUserNotAuthorized:
-		return ExitAPI, "permission", "check app permissions or re-authorize: lark-cli auth login"
+		return ExitAPI, "permission", "check app permissions or re-authorize: xfchat_cli auth login"
 
 	// app credential / status
 	case LarkErrAppCredInvalid:
-		return ExitAuth, "config", "check app_id / app_secret: lark-cli config set"
+		return ExitAuth, "config", "check app_id / app_secret: xfchat_cli config set"
 	case LarkErrAppNotInUse, LarkErrAppUnauthorized:
 		return ExitAuth, "app_status", "app is disabled or not installed — check developer console"
 

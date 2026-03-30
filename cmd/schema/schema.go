@@ -38,7 +38,7 @@ func printServices(w io.Writer) {
 		}
 		fmt.Fprintf(w, "  %s%s%s  %s%s%s\n", output.Cyan, s, output.Reset, output.Dim, title, output.Reset)
 	}
-	fmt.Fprintf(w, "\n%sUsage: lark-cli schema <service>.<resource>.<method>%s\n", output.Dim, output.Reset)
+	fmt.Fprintf(w, "\n%sUsage: xfchat_cli schema <service>.<resource>.<method>%s\n", output.Dim, output.Reset)
 }
 
 func printResourceList(w io.Writer, spec map[string]interface{}) {
@@ -70,7 +70,7 @@ func printResourceList(w io.Writer, spec map[string]interface{}) {
 		}
 		fmt.Fprintln(w)
 	}
-	fmt.Fprintf(w, "%sUsage: lark-cli schema %s.<resource>.<method>%s\n", output.Dim, name, output.Reset)
+	fmt.Fprintf(w, "%sUsage: xfchat_cli schema %s.<resource>.<method>%s\n", output.Dim, name, output.Reset)
 }
 
 func printMethodDetail(w io.Writer, spec map[string]interface{}, resName, methodName string, method map[string]interface{}) {
@@ -184,7 +184,7 @@ func printMethodDetail(w io.Writer, spec map[string]interface{}, resName, method
 	}
 
 	// CLI example
-	fmt.Fprintf(w, "%sCLI:%s      lark-cli %s %s %s\n", output.Bold, output.Reset, specName, resName, methodName)
+	fmt.Fprintf(w, "%sCLI:%s      xfchat_cli %s %s %s\n", output.Bold, output.Reset, specName, resName, methodName)
 
 	// Docs
 	if docUrl := registry.GetStrFromMap(method, "docUrl"); docUrl != "" {
@@ -471,7 +471,7 @@ func schemaRun(opts *SchemaOptions) error {
 				desc := registry.GetStrFromMap(m, "description")
 				fmt.Fprintf(out, "  %-7s %s%s%s  %s%s%s\n", httpMethod, output.Bold, mName, output.Reset, output.Dim, desc, output.Reset)
 			}
-			fmt.Fprintf(out, "\n%sUsage: lark-cli schema %s.%s.<method>%s\n", output.Dim, serviceName, resName, output.Reset)
+			fmt.Fprintf(out, "\n%sUsage: xfchat_cli schema %s.%s.<method>%s\n", output.Dim, serviceName, resName, output.Reset)
 		} else {
 			output.PrintJson(out, resource)
 		}

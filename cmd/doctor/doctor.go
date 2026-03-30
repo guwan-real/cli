@@ -71,7 +71,7 @@ func doctorRun(opts *DoctorOptions) error {
 	// ── 1. Config file ──
 	_, err := core.LoadMultiAppConfig()
 	if err != nil {
-		checks = append(checks, fail("config_file", err.Error(), "run: lark-cli config init"))
+		checks = append(checks, fail("config_file", err.Error(), "run: xfchat_cli config init"))
 		return finishDoctor(f, checks)
 	}
 	checks = append(checks, pass("config_file", "config.json found"))
@@ -93,13 +93,13 @@ func doctorRun(opts *DoctorOptions) error {
 
 	// ── 3. Token exists ──
 	if cfg.UserOpenId == "" {
-		checks = append(checks, fail("token_exists", "no user logged in", "run: lark-cli auth login --help"))
+		checks = append(checks, fail("token_exists", "no user logged in", "run: xfchat_cli auth login --help"))
 		checks = append(checks, networkChecks(opts.Ctx, opts, ep)...)
 		return finishDoctor(f, checks)
 	}
 	stored := larkauth.GetStoredToken(cfg.AppID, cfg.UserOpenId)
 	if stored == nil {
-		checks = append(checks, fail("token_exists", "no token in keychain for "+cfg.UserOpenId, "run: lark-cli auth login --help"))
+		checks = append(checks, fail("token_exists", "no token in keychain for "+cfg.UserOpenId, "run: xfchat_cli auth login --help"))
 		checks = append(checks, networkChecks(opts.Ctx, opts, ep)...)
 		return finishDoctor(f, checks)
 	}
@@ -113,7 +113,7 @@ func doctorRun(opts *DoctorOptions) error {
 	case "needs_refresh":
 		checks = append(checks, pass("token_local", "token needs refresh (will auto-refresh on next call)"))
 	default: // expired
-		checks = append(checks, fail("token_local", "token expired", "run: lark-cli auth login --help"))
+		checks = append(checks, fail("token_local", "token expired", "run: xfchat_cli auth login --help"))
 		checks = append(checks, networkChecks(opts.Ctx, opts, ep)...)
 		return finishDoctor(f, checks)
 	}
@@ -125,13 +125,13 @@ func doctorRun(opts *DoctorOptions) error {
 		httpClient := mustHTTPClient(f)
 		token, err := larkauth.GetValidAccessToken(httpClient, larkauth.NewUATCallOptions(cfg, f.IOStreams.ErrOut))
 		if err != nil {
-			checks = append(checks, fail("token_verified", "cannot obtain valid token: "+err.Error(), "run: lark-cli auth login --help"))
+			checks = append(checks, fail("token_verified", "cannot obtain valid token: "+err.Error(), "run: xfchat_cli auth login --help"))
 		} else {
 			sdk, err := f.LarkClient()
 			if err != nil {
 				checks = append(checks, fail("token_verified", "SDK init failed: "+err.Error(), ""))
 			} else if err := larkauth.VerifyUserToken(opts.Ctx, sdk, token); err != nil {
-				checks = append(checks, fail("token_verified", "server rejected token: "+err.Error(), "run: lark-cli auth login --help"))
+				checks = append(checks, fail("token_verified", "server rejected token: "+err.Error(), "run: xfchat_cli auth login --help"))
 			} else {
 				checks = append(checks, pass("token_verified", "server confirmed token is valid"))
 			}

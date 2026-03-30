@@ -169,7 +169,7 @@ var MailReplyAll = common.Shortcut{
 		if !confirmSend {
 			runtime.Out(map[string]interface{}{
 				"draft_id": draftID,
-				"tip":      fmt.Sprintf(`draft saved. To send: lark-cli mail user_mailbox.drafts send --params '{"user_mailbox_id":"%s","draft_id":"%s"}'`, mailboxID, draftID),
+				"tip":      fmt.Sprintf(`draft saved. To send: xfchat_cli mail user_mailbox.drafts send --params '{"user_mailbox_id":"%s","draft_id":"%s"}'`, mailboxID, draftID),
 			}, nil)
 			hintSendDraft(runtime, mailboxID, draftID)
 			return nil

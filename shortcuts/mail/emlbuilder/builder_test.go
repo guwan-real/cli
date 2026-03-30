@@ -56,7 +56,7 @@ func TestBuild_SingleTextPlain_ASCII(t *testing.T) {
 		To("Bob", "bob@example.com").
 		Subject("Hello").
 		Date(fixedDate).
-		MessageID("test-id@lark-cli").
+		MessageID("test-id@xfchat_cli").
 		TextBody([]byte("Hello world")).
 		Build()
 	if err != nil {

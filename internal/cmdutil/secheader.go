@@ -17,12 +17,12 @@ const (
 	HeaderShortcut    = "X-Cli-Shortcut"
 	HeaderExecutionId = "X-Cli-Execution-Id"
 
-	SourceValue = "lark-cli"
+	SourceValue = "xfchat_cli"
 
 	HeaderUserAgent = "User-Agent"
 )
 
-// UserAgentValue returns the User-Agent value: "lark-cli/{version}".
+// UserAgentValue returns the User-Agent value: "xfchat_cli/{version}".
 func UserAgentValue() string {
 	return SourceValue + "/" + build.Version
 }

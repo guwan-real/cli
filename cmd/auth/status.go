@@ -61,7 +61,7 @@ func authStatusRun(opts *StatusOptions) error {
 
 	if config.UserOpenId == "" {
 		result["identity"] = "bot"
-		result["note"] = "No user logged in. Only bot (tenant) identity is available for API calls. Run `lark-cli auth login` to log in."
+		result["note"] = "No user logged in. Only bot (tenant) identity is available for API calls. Run `xfchat_cli auth login` to log in."
 		output.PrintJson(f.IOStreams.Out, result)
 		return nil
 	}
@@ -71,7 +71,7 @@ func authStatusRun(opts *StatusOptions) error {
 		result["identity"] = "bot"
 		result["userName"] = config.UserName
 		result["userOpenId"] = config.UserOpenId
-		result["note"] = "Token does not exist or has been cleared. Only bot (tenant) identity is available. Re-login: lark-cli auth login"
+		result["note"] = "Token does not exist or has been cleared. Only bot (tenant) identity is available. Re-login: xfchat_cli auth login"
 		output.PrintJson(f.IOStreams.Out, result)
 		return nil
 	}
@@ -79,7 +79,7 @@ func authStatusRun(opts *StatusOptions) error {
 	status := larkauth.TokenStatus(stored)
 	if status == "expired" {
 		result["identity"] = "bot"
-		result["note"] = "User token has expired. Only bot (tenant) identity is available. Re-login: lark-cli auth login"
+		result["note"] = "User token has expired. Only bot (tenant) identity is available. Re-login: xfchat_cli auth login"
 	} else {
 		result["identity"] = "user"
 	}

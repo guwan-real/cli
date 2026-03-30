@@ -485,7 +485,7 @@ func enhancePermissionError(err error, requiredScopes []string) error {
 	scopeDisplay := strings.Join(requiredScopes, ", ")
 	scopeArg := strings.Join(requiredScopes, " ")
 	hint := fmt.Sprintf(
-		"this command requires scope(s): %s\nrun `lark-cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.",
+		"this command requires scope(s): %s\nrun `xfchat_cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.",
 		scopeDisplay, scopeArg)
 	// Return a new error instead of mutating the original's Detail in place.
 	return output.ErrWithHint(exitErr.Code, exitErr.Detail.Type, exitErr.Detail.Message, hint)
@@ -587,7 +587,7 @@ func checkShortcutScopes(as core.Identity, config *core.CliConfig, scopes []stri
 	}
 	return output.ErrWithHint(output.ExitAuth, "missing_scope",
 		fmt.Sprintf("missing required scope(s): %s", strings.Join(missing, ", ")),
-		fmt.Sprintf("run `lark-cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", strings.Join(missing, " ")))
+		fmt.Sprintf("run `xfchat_cli auth login --scope \"%s\"` in the background. It blocks and outputs a verification URL — retrieve the URL and open it in a browser to complete login.", strings.Join(missing, " ")))
 }
 
 func newRuntimeContext(cmd *cobra.Command, f *cmdutil.Factory, s *Shortcut, config *core.CliConfig, as core.Identity, botOnly bool) (*RuntimeContext, error) {

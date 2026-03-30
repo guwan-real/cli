@@ -90,9 +90,9 @@ func GetValidAccessToken(httpClient *http.Client, opts UATCallOptions) (string, 
 	// expired
 	if err := RemoveStoredToken(opts.AppId, opts.UserOpenId); err != nil {
 		if opts.ErrOut != nil {
-			fmt.Fprintf(opts.ErrOut, "[lark-cli] [WARN] uat-client: failed to remove token: %v\n", err)
+			fmt.Fprintf(opts.ErrOut, "[xfchat_cli] [WARN] uat-client: failed to remove token: %v\n", err)
 		} else {
-			fmt.Fprintf(os.Stderr, "[lark-cli] [WARN] uat-client: failed to remove token: %v\n", err)
+			fmt.Fprintf(os.Stderr, "[xfchat_cli] [WARN] uat-client: failed to remove token: %v\n", err)
 		}
 	}
 	return "", &NeedAuthorizationError{UserOpenId: opts.UserOpenId}
@@ -155,7 +155,7 @@ func refreshWithLock(httpClient *http.Client, opts UATCallOptions, stored *Store
 		if status == "valid" {
 			// Another process refreshed it, we can just use the new token
 			if opts.ErrOut != nil {
-				fmt.Fprintf(opts.ErrOut, "[lark-cli] uat-client: token already refreshed by another process\n")
+				fmt.Fprintf(opts.ErrOut, "[xfchat_cli] uat-client: token already refreshed by another process\n")
 			}
 			return freshStored, nil
 		}
@@ -173,9 +173,9 @@ func doRefreshToken(httpClient *http.Client, opts UATCallOptions, stored *Stored
 
 	now := time.Now().UnixMilli()
 	if now >= stored.RefreshExpiresAt {
-		fmt.Fprintf(errOut, "[lark-cli] uat-client: refresh_token expired for %s, clearing\n", opts.UserOpenId)
+		fmt.Fprintf(errOut, "[xfchat_cli] uat-client: refresh_token expired for %s, clearing\n", opts.UserOpenId)
 		if err := RemoveStoredToken(opts.AppId, opts.UserOpenId); err != nil {
-			fmt.Fprintf(errOut, "[lark-cli] [WARN] uat-client: failed to remove expired token: %v\n", err)
+			fmt.Fprintf(errOut, "[xfchat_cli] [WARN] uat-client: failed to remove expired token: %v\n", err)
 		}
 		return nil, nil
 	}
@@ -236,30 +236,30 @@ func doRefreshToken(httpClient *http.Client, opts UATCallOptions, stored *Stored
 	if (code != -1 && code != 0) || errStr != "" {
 		// Retryable server error: retry once, then clear token on second failure.
 		if RefreshTokenRetryable[code] {
-			fmt.Fprintf(errOut, "[lark-cli] [WARN] uat-client: refresh transient error (code=%d) for %s, retrying once\n", code, opts.UserOpenId)
+			fmt.Fprintf(errOut, "[xfchat_cli] [WARN] uat-client: refresh transient error (code=%d) for %s, retrying once\n", code, opts.UserOpenId)
 			data, err = callEndpoint()
 			if err != nil {
-				fmt.Fprintf(errOut, "[lark-cli] [WARN] uat-client: refresh retry network error for %s, clearing token\n", opts.UserOpenId)
+				fmt.Fprintf(errOut, "[xfchat_cli] [WARN] uat-client: refresh retry network error for %s, clearing token\n", opts.UserOpenId)
 				if err := RemoveStoredToken(opts.AppId, opts.UserOpenId); err != nil {
-					fmt.Fprintf(errOut, "[lark-cli] [WARN] uat-client: failed to remove token: %v\n", err)
+					fmt.Fprintf(errOut, "[xfchat_cli] [WARN] uat-client: failed to remove token: %v\n", err)
 				}
 				return nil, nil
 			}
 			code = getInt(data, "code", -1)
 			errStr = getStr(data, "error")
 			if (code != -1 && code != 0) || errStr != "" {
-				fmt.Fprintf(errOut, "[lark-cli] [WARN] uat-client: refresh failed after retry (code=%d) for %s, clearing token\n", code, opts.UserOpenId)
+				fmt.Fprintf(errOut, "[xfchat_cli] [WARN] uat-client: refresh failed after retry (code=%d) for %s, clearing token\n", code, opts.UserOpenId)
 				if err := RemoveStoredToken(opts.AppId, opts.UserOpenId); err != nil {
-					fmt.Fprintf(errOut, "[lark-cli] [WARN] uat-client: failed to remove token: %v\n", err)
+					fmt.Fprintf(errOut, "[xfchat_cli] [WARN] uat-client: failed to remove token: %v\n", err)
 				}
 				return nil, nil
 			}
 			// Retry succeeded, fall through to parse token below.
 		} else {
 			// All other errors: clear token, require re-authorization.
-			fmt.Fprintf(errOut, "[lark-cli] [WARN] uat-client: refresh failed (code=%d), clearing token for %s\n", code, opts.UserOpenId)
+			fmt.Fprintf(errOut, "[xfchat_cli] [WARN] uat-client: refresh failed (code=%d), clearing token for %s\n", code, opts.UserOpenId)
 			if err := RemoveStoredToken(opts.AppId, opts.UserOpenId); err != nil {
-				fmt.Fprintf(errOut, "[lark-cli] [WARN] uat-client: failed to remove token: %v\n", err)
+				fmt.Fprintf(errOut, "[xfchat_cli] [WARN] uat-client: failed to remove token: %v\n", err)
 			}
 			return nil, nil
 		}
