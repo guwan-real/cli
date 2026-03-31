@@ -33,7 +33,7 @@ var DocMediaInsert = common.Shortcut{
 	Command:     "+media-insert",
 	Description: "Insert a local image or file at the end of a Lark document (4-step orchestration + auto-rollback)",
 	Risk:        "write",
-	Scopes:      []string{"docs:document.media:upload", "docx:document:write_only", "docx:document:readonly"},
+	Scopes:      []string{"docs:document.media:upload", "docx:document", "docx:document:readonly"},
 	AuthTypes:   []string{"user", "bot"},
 	Flags: []common.Flag{
 		{Name: "file", Desc: "local file path (max 20MB)", Required: true},

@@ -6,6 +6,7 @@ package doc
 import (
 	"context"
 
+	"github.com/larksuite/cli/internal/output"
 	"github.com/larksuite/cli/shortcuts/common"
 )
 
@@ -81,6 +82,15 @@ var DocsCreate = common.Shortcut{
 		result, err := common.CallMCPTool(runtime, "create-doc", args)
 		if err != nil {
 			return err
+		}
+		if shouldFallbackToDocxOpenAPI(result) {
+			if runtime.Str("folder-token") != "" || runtime.Str("wiki-node") != "" || runtime.Str("wiki-space") != "" {
+				return output.ErrValidation("private deployment fallback does not yet support --folder-token/--wiki-node/--wiki-space")
+			}
+			result, err = createDocxViaOpenAPI(runtime, runtime.Str("title"), runtime.Str("markdown"))
+			if err != nil {
+				return err
+			}
 		}
 
 		runtime.Out(result, nil)

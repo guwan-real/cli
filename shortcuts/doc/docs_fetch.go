@@ -60,6 +60,12 @@ var DocsFetch = common.Shortcut{
 		if err != nil {
 			return err
 		}
+		if shouldFallbackToDocxOpenAPI(result) {
+			result, err = fetchDocxViaOpenAPI(runtime, runtime.Str("doc"))
+			if err != nil {
+				return err
+			}
+		}
 
 		runtime.OutFormat(result, nil, func(w io.Writer) {
 			if title, ok := result["title"].(string); ok && title != "" {

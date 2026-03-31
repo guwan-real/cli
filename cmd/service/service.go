@@ -34,6 +34,9 @@ func RegisterServiceCommands(parent *cobra.Command, f *cmdutil.Factory) {
 		if specName == "" || servicePath == "" {
 			continue
 		}
+		if specName == "mail" {
+			continue
+		}
 		resources, _ := spec["resources"].(map[string]interface{})
 		if resources == nil {
 			continue

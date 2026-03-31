@@ -7,6 +7,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/larksuite/cli/internal/output"
 	"github.com/larksuite/cli/shortcuts/common"
 )
 
@@ -33,7 +34,7 @@ var DocsUpdate = common.Shortcut{
 	Command:     "+update",
 	Description: "Update a Lark document",
 	Risk:        "write",
-	Scopes:      []string{"docx:document:write_only", "docx:document:readonly"},
+	Scopes:      []string{"docx:document", "docx:document:readonly"},
 	AuthTypes:   []string{"user", "bot"},
 	Flags: []common.Flag{
 		{Name: "doc", Desc: "document URL or token", Required: true},
@@ -109,6 +110,15 @@ var DocsUpdate = common.Shortcut{
 		result, err := common.CallMCPTool(runtime, "update-doc", args)
 		if err != nil {
 			return err
+		}
+		if shouldFallbackToDocxOpenAPI(result) {
+			if isWhiteboardCreateMarkdown(runtime.Str("markdown")) {
+				return output.ErrValidation("private deployment fallback does not support whiteboard markdown via docs +update")
+			}
+			result, err = updateDocxViaOpenAPI(runtime, runtime.Str("doc"), runtime.Str("mode"), runtime.Str("markdown"))
+			if err != nil {
+				return err
+			}
 		}
 
 		normalizeDocsUpdateResult(result, runtime.Str("markdown"))
